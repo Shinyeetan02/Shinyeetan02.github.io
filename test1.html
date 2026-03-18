@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寂寞的小兔子 - 景深故事</title>
+    <title>寂寞的小兔子 - 景深測試</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
@@ -44,9 +44,9 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
-            /* 初始模糊 */
-            filter: blur(4px);
-            transition: filter 0.1s ease-out;
+            /* 初始模糊數值 */
+            filter: blur(6px);
+            will-change: filter;
         }
 
         .character-overlay {
@@ -59,20 +59,15 @@
             pointer-events: none;
         }
 
-        /* 移除水彩濾鏡樣式 */
-        .no-filter {
-            filter: none !important;
-        }
-
-        /* 控制群組模糊 */
+        /* 控制群組初始模糊 */
         #white-rabbit-group {
-            filter: blur(8px);
-            transition: filter 0.1s ease-out;
+            filter: blur(10px);
+            will-change: filter;
         }
 
+        /* 黑色兔子永遠清晰 */
         #black-rabbit-group {
-            filter: blur(0px);
-            transition: filter 0.1s ease-out;
+            filter: none;
         }
     </style>
 </head>
@@ -125,26 +120,26 @@
     <script>
         const bg = document.getElementById('bg');
         const whiteRabbit = document.getElementById('white-rabbit-group');
-        const blackRabbit = document.getElementById('black-rabbit-group');
 
+        // 監聽滾動事件
         window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = Math.min(scrollTop / maxScroll, 1);
+            
+            // 計算捲動百分比 (0 到 1)
+            const scrollPercent = Math.max(0, Math.min(scrollTop / maxScroll, 1));
 
-            // 景深邏輯：
-            // 1. 小白兔：從模糊(8px) 變 清晰(0px)
-            const whiteBlur = 8 - (scrollPercent * 8);
-            whiteRabbit.style.filter = `blur(${whiteBlur}px)`;
+            // 1. 小白兔：從 10px 模糊變為 0px 清晰
+            const whiteBlurValue = 10 * (1 - scrollPercent);
+            whiteRabbit.style.filter = `blur(${whiteBlurValue}px)`;
 
-            // 2. 背景：從模糊(4px) 變 清晰(0px)
-            const bgBlur = 4 - (scrollPercent * 4);
-            bg.style.filter = `blur(${bgBlur}px)`;
-
-            // 3. 黑色兔子 (可選)：當重心移向後方，近處可以稍微模糊一點 (0px -> 2px)
-            const blackBlur = scrollPercent * 2;
-            blackRabbit.style.filter = `blur(${blackBlur}px)`;
+            // 2. 背景：從 6px 模糊變為 0px 清晰
+            const bgBlurValue = 6 * (1 - scrollPercent);
+            bg.style.filter = `blur(${bgBlurValue}px)`;
         });
+
+        // 初始執行一次，確保正確載入當前狀態
+        window.dispatchEvent(new Event('scroll'));
     </script>
 </body>
 </html>
