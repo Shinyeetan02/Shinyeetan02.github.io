@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寂寞的小兔子 - 景深測試</title>
+    <title>寂寞的小兔子 - 景深故事</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
@@ -16,9 +16,11 @@
             font-family: "Noto Sans TC", sans-serif;
         }
 
-        /* 滾動空間：控制景深切換的長度 */
+        /* 捲動空間：決定動畫的長度 */
         .scroll-container {
-            height: 300vh;
+            height: 400vh; /* 增加捲動空間讓動畫更細膩 */
+            position: relative;
+            z-index: 1;
         }
 
         #app {
@@ -30,7 +32,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1;
+            z-index: 5;
+            pointer-events: none;
         }
 
         /* 背景圖層 */
@@ -44,8 +47,8 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
-            /* 初始模糊數值 */
-            filter: blur(6px);
+            /* 初始狀態由 JS 接管，這裡設定基礎濾鏡 */
+            filter: blur(10px);
             will-change: filter;
         }
 
@@ -56,18 +59,17 @@
             width: 100%;
             height: 100%;
             z-index: 10;
-            pointer-events: none;
         }
 
-        /* 控制群組初始模糊 */
+        /* 小白兔群組：初始模糊 */
         #white-rabbit-group {
-            filter: blur(10px);
+            filter: blur(15px);
             will-change: filter;
         }
 
-        /* 黑色兔子永遠清晰 */
+        /* 黑色兔子：永遠保持清晰 */
         #black-rabbit-group {
-            filter: none;
+            filter: none !important;
         }
     </style>
 </head>
@@ -81,21 +83,21 @@
         <!-- 角色層 (SVG) -->
         <svg class="character-overlay" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
             
-            <!-- 右側：小白兔 (全身、佔比放大、悲傷、拿書) -->
+            <!-- 右側：小白兔 (全身、悲傷、拿書) -->
             <g id="white-rabbit-group" transform="translate(580, 420) scale(1.0)">
                 <!-- 陰影 -->
                 <ellipse cx="20" cy="65" rx="45" ry="12" fill="rgba(0,0,0,0.08)" />
-                <!-- 耳朵 (悲傷下垂) -->
+                <!-- 耳朵 -->
                 <ellipse cx="5" cy="-5" rx="6" ry="25" fill="#ffffff" transform="rotate(-15)" />
                 <ellipse cx="35" cy="-5" rx="6" ry="25" fill="#ffffff" transform="rotate(15)" />
                 <!-- 身體 -->
                 <path d="M 0 60 Q 20 0 40 60 Z" fill="#ffffff" />
                 <circle cx="20" cy="20" r="22" fill="#ffffff" />
-                <!-- 悲傷的眼 -->
+                <!-- 臉部細節 -->
                 <path d="M 10 22 Q 15 26 20 22" stroke="#64748b" stroke-width="1.5" fill="none" />
                 <path d="M 22 22 Q 27 26 32 22" stroke="#64748b" stroke-width="1.5" fill="none" />
                 <path d="M 18 30 L 20 32 L 22 30" stroke="#fca5a5" stroke-width="1.5" fill="none" />
-                <!-- 手裡的書 -->
+                <!-- 書本 -->
                 <rect x="-5" y="35" width="30" height="35" fill="#475569" rx="2" transform="rotate(-10)" />
                 <line x1="0" y1="42" x2="20" y2="42" stroke="#94a3b8" stroke-width="1" transform="rotate(-10)" />
                 <line x1="0" y1="47" x2="20" y2="47" stroke="#94a3b8" stroke-width="1" transform="rotate(-10)" />
@@ -103,7 +105,7 @@
                 <circle cx="45" cy="55" r="7" fill="#f8fafc" />
             </g>
 
-            <!-- 左側：黑色兔子 (透過 image 讀取外部檔案) -->
+            <!-- 左側：黑色兔子 (讀取外部檔案) -->
             <g id="black-rabbit-group">
                 <image 
                     href="blackrabbit-test_工作區域 1.svg" 
@@ -114,32 +116,57 @@
         </svg>
     </div>
 
-    <!-- 滾動觸發器 -->
+    <!-- 用於產生捲動軸的空間 -->
     <div class="scroll-container"></div>
 
     <script>
         const bg = document.getElementById('bg');
         const whiteRabbit = document.getElementById('white-rabbit-group');
 
-        // 監聽滾動事件
-        window.addEventListener('scroll', () => {
+        let ticking = false;
+
+        function updateElements() {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
             
+            // 計算最大可捲動距離
+            const maxScroll = scrollHeight - windowHeight;
+            
+            // 安全檢查，防止除以零
+            if (maxScroll <= 0) return;
+
             // 計算捲動百分比 (0 到 1)
             const scrollPercent = Math.max(0, Math.min(scrollTop / maxScroll, 1));
 
-            // 1. 小白兔：從 10px 模糊變為 0px 清晰
-            const whiteBlurValue = 10 * (1 - scrollPercent);
-            whiteRabbit.style.filter = `blur(${whiteBlurValue}px)`;
+            // 1. 小白兔景深切換：從 15px 模糊 變為 0px 清晰
+            const whiteBlur = 15 * (1 - scrollPercent);
+            whiteRabbit.style.filter = `blur(${whiteBlur}px)`;
 
-            // 2. 背景：從 6px 模糊變為 0px 清晰
-            const bgBlurValue = 6 * (1 - scrollPercent);
-            bg.style.filter = `blur(${bgBlurValue}px)`;
+            // 2. 背景景深切換：從 10px 模糊 變為 0px 清晰
+            const bgBlur = 10 * (1 - scrollPercent);
+            bg.style.filter = `blur(${bgBlur}px)`;
+
+            ticking = false;
+        }
+
+        // 使用 requestAnimationFrame 優化效能
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateElements();
+                });
+                ticking = true;
+            }
         });
 
-        // 初始執行一次，確保正確載入當前狀態
-        window.dispatchEvent(new Event('scroll'));
+        // 監聽視窗縮放，重新計算動畫位置
+        window.addEventListener('resize', updateElements);
+
+        // 初始化狀態
+        document.addEventListener('DOMContentLoaded', updateElements);
+        // 強制執行一次以修正初始載入位置
+        updateElements();
     </script>
 </body>
 </html>
