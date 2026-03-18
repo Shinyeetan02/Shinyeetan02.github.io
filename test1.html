@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寂寞的小兔子 - 景深故事</title>
+    <title>寂寞的小兔子 - 景深測試</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
@@ -11,16 +11,10 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow-x: hidden;
+            overflow: hidden; /* 禁用捲動 */
             background-color: #f3f4f6;
             font-family: "Noto Sans TC", sans-serif;
-        }
-
-        /* 捲動空間：決定動畫的長度 */
-        .scroll-container {
-            height: 400vh; /* 增加捲動空間讓動畫更細膩 */
-            position: relative;
-            z-index: 1;
+            cursor: pointer; /* 提示使用者可以點擊 */
         }
 
         #app {
@@ -33,7 +27,6 @@
             justify-content: center;
             align-items: center;
             z-index: 5;
-            pointer-events: none;
         }
 
         /* 背景圖層 */
@@ -47,8 +40,9 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
-            /* 初始狀態由 JS 接管，這裡設定基礎濾鏡 */
+            /* 初始模糊狀態 */
             filter: blur(10px);
+            transition: filter 2s ease-in-out; /* 平滑過渡動畫 */
             will-change: filter;
         }
 
@@ -59,11 +53,13 @@
             width: 100%;
             height: 100%;
             z-index: 10;
+            pointer-events: none;
         }
 
         /* 小白兔群組：初始模糊 */
         #white-rabbit-group {
             filter: blur(15px);
+            transition: filter 2s ease-in-out; /* 平滑過渡動畫 */
             will-change: filter;
         }
 
@@ -71,11 +67,38 @@
         #black-rabbit-group {
             filter: none !important;
         }
+
+        /* 清晰狀態的類別 */
+        .is-focused #bg {
+            filter: blur(0px);
+        }
+        .is-focused #white-rabbit-group {
+            filter: blur(0px);
+        }
+
+        /* 提示文字 */
+        .hint {
+            position: fixed;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            letter-spacing: 0.2rem;
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
     </style>
 </head>
-<body>
+<body onclick="toggleFocus()">
 
-    <!-- 視覺顯示區域 (固定) -->
     <div id="app">
         <!-- 背景圖層 -->
         <div id="bg" class="background-image"></div>
@@ -116,57 +139,26 @@
         </svg>
     </div>
 
-    <!-- 用於產生捲動軸的空間 -->
-    <div class="scroll-container"></div>
+    <div class="hint" id="hintText">點擊畫面看看</div>
 
     <script>
-        const bg = document.getElementById('bg');
-        const whiteRabbit = document.getElementById('white-rabbit-group');
+        let focused = false;
 
-        let ticking = false;
-
-        function updateElements() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollHeight = document.documentElement.scrollHeight;
-            const windowHeight = window.innerHeight;
+        function toggleFocus() {
+            focused = !focused;
+            const app = document.getElementById('app');
+            const hint = document.getElementById('hintText');
             
-            // 計算最大可捲動距離
-            const maxScroll = scrollHeight - windowHeight;
-            
-            // 安全檢查，防止除以零
-            if (maxScroll <= 0) return;
-
-            // 計算捲動百分比 (0 到 1)
-            const scrollPercent = Math.max(0, Math.min(scrollTop / maxScroll, 1));
-
-            // 1. 小白兔景深切換：從 15px 模糊 變為 0px 清晰
-            const whiteBlur = 15 * (1 - scrollPercent);
-            whiteRabbit.style.filter = `blur(${whiteBlur}px)`;
-
-            // 2. 背景景深切換：從 10px 模糊 變為 0px 清晰
-            const bgBlur = 10 * (1 - scrollPercent);
-            bg.style.filter = `blur(${bgBlur}px)`;
-
-            ticking = false;
-        }
-
-        // 使用 requestAnimationFrame 優化效能
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    updateElements();
-                });
-                ticking = true;
+            if (focused) {
+                app.classList.add('is-focused');
+                hint.textContent = "再次點擊看看";
+                hint.style.opacity = "0.2";
+            } else {
+                app.classList.remove('is-focused');
+                hint.textContent = "點擊畫面看看";
+                hint.style.opacity = "0.6";
             }
-        });
-
-        // 監聽視窗縮放，重新計算動畫位置
-        window.addEventListener('resize', updateElements);
-
-        // 初始化狀態
-        document.addEventListener('DOMContentLoaded', updateElements);
-        // 強制執行一次以修正初始載入位置
-        updateElements();
+        }
     </script>
 </body>
 </html>
