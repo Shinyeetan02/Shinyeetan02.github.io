@@ -87,6 +87,11 @@
             letter-spacing: 0.2rem;
             z-index: 20;
             pointer-events: none;
+            opacity: 0; /* 初始隱藏，由 JS 控制顯示 */
+            transition: opacity 1s ease;
+        }
+
+        .hint.visible {
             opacity: 0.6;
             animation: pulse 2s infinite;
         }
@@ -94,6 +99,15 @@
         @keyframes pulse {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 0.7; }
+        }
+
+        /* 開場文字樣式 */
+        #intro-text {
+            font-size: 24px;
+            fill: #475569;
+            font-weight: 300;
+            letter-spacing: 0.2rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
         }
     </style>
 </head>
@@ -128,8 +142,11 @@
                 <circle cx="45" cy="55" r="7" fill="#f8fafc" />
             </g>
 
-            <!-- 左側：黑色兔子 (讀取外部檔案) -->
+            <!-- 左側：黑色兔子 -->
             <g id="black-rabbit-group">
+                <!-- 開場文字：位於黑兔頭部上方 -->
+                <text id="intro-text-element" x="300" y="320" text-anchor="middle" id="intro-text"></text>
+                
                 <image 
                     href="blackrabbit-test_工作區域 1.svg" 
                     x="120" y="300" 
@@ -143,8 +160,31 @@
 
     <script>
         let focused = false;
+        const introString = "小白兔在做什麼呢？";
+        const introElement = document.getElementById('intro-text-element');
+        const hintElement = document.getElementById('hintText');
+
+        // 打字效果函式
+        function typeIntroText() {
+            let i = 0;
+            const timer = setInterval(() => {
+                if (i < introString.length) {
+                    introElement.textContent += introString.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(timer);
+                    // 打字結束後顯示 Hint
+                    setTimeout(() => {
+                        hintElement.classList.add('visible');
+                    }, 500);
+                }
+            }, 150); // 設定快速打字速度
+        }
 
         function toggleFocus() {
+            // 只有在 Hint 已經出現（文字跑完）後，點擊才有反應
+            if (!hintElement.classList.contains('visible')) return;
+
             focused = !focused;
             const app = document.getElementById('app');
             const hint = document.getElementById('hintText');
@@ -152,13 +192,14 @@
             if (focused) {
                 app.classList.add('is-focused');
                 hint.textContent = "再次點擊看看";
-                hint.style.opacity = "0.2";
             } else {
                 app.classList.remove('is-focused');
                 hint.textContent = "點擊畫面看看";
-                hint.style.opacity = "0.6";
             }
         }
+
+        // 頁面載入後啟動打字動畫
+        window.onload = typeIntroText;
     </script>
 </body>
 </html>
