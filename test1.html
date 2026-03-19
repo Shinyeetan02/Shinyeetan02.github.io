@@ -29,7 +29,7 @@
             z-index: 5;
         }
 
-        /* 背景圖層 */
+        /* 背景圖層（HTML 元素，Safari 支援 CSS filter） */
         .background-image {
             position: absolute;
             top: 0;
@@ -40,9 +40,8 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
-            /* 初始模糊狀態 */
             filter: blur(10px);
-            transition: filter 2s ease-in-out; /* 平滑過渡動畫 */
+            transition: filter 2s ease-in-out;
             will-change: filter;
         }
 
@@ -56,11 +55,9 @@
             pointer-events: none;
         }
 
-        /* 小白兔群組：初始模糊 */
+        /* 針對 Safari 優化：使用 SVG 濾鏡 ID */
         #white-rabbit-group {
-            filter: blur(15px);
-            transition: filter 2s ease-in-out; /* 平滑過渡動畫 */
-            will-change: filter;
+            filter: url(#svgBlurFilter); /* 使用原生 SVG 濾鏡 */
         }
 
         /* 黑色兔子：永遠保持清晰 */
@@ -70,9 +67,6 @@
 
         /* 清晰狀態的類別 */
         .is-focused #bg {
-            filter: blur(0px);
-        }
-        .is-focused #white-rabbit-group {
             filter: blur(0px);
         }
 
@@ -87,7 +81,7 @@
             letter-spacing: 0.2rem;
             z-index: 20;
             pointer-events: none;
-            opacity: 0; /* 初始隱藏，由 JS 控制顯示 */
+            opacity: 0;
             transition: opacity 1s ease;
         }
 
@@ -102,7 +96,7 @@
         }
 
         /* 開場文字樣式 */
-        #intro-text {
+        #intro-text-element {
             font-size: 24px;
             fill: #475569;
             font-weight: 300;
@@ -119,34 +113,32 @@
 
         <!-- 角色層 (SVG) -->
         <svg class="character-overlay" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <!-- 原生 SVG 濾鏡：這是 Safari 唯一 100% 支援的 SVG 模糊方式 -->
+                <filter id="svgBlurFilter">
+                    <feGaussianBlur id="blurElement" stdDeviation="15" />
+                </filter>
+            </defs>
             
-            <!-- 右側：小白兔 (全身、悲傷、拿書) -->
+            <!-- 右側：小白兔 -->
             <g id="white-rabbit-group" transform="translate(580, 420) scale(1.0)">
-                <!-- 陰影 -->
                 <ellipse cx="20" cy="65" rx="45" ry="12" fill="rgba(0,0,0,0.08)" />
-                <!-- 耳朵 -->
                 <ellipse cx="5" cy="-5" rx="6" ry="25" fill="#ffffff" transform="rotate(-15)" />
                 <ellipse cx="35" cy="-5" rx="6" ry="25" fill="#ffffff" transform="rotate(15)" />
-                <!-- 身體 -->
                 <path d="M 0 60 Q 20 0 40 60 Z" fill="#ffffff" />
                 <circle cx="20" cy="20" r="22" fill="#ffffff" />
-                <!-- 臉部細節 -->
                 <path d="M 10 22 Q 15 26 20 22" stroke="#64748b" stroke-width="1.5" fill="none" />
                 <path d="M 22 22 Q 27 26 32 22" stroke="#64748b" stroke-width="1.5" fill="none" />
                 <path d="M 18 30 L 20 32 L 22 30" stroke="#fca5a5" stroke-width="1.5" fill="none" />
-                <!-- 書本 -->
                 <rect x="-5" y="35" width="30" height="35" fill="#475569" rx="2" transform="rotate(-10)" />
                 <line x1="0" y1="42" x2="20" y2="42" stroke="#94a3b8" stroke-width="1" transform="rotate(-10)" />
                 <line x1="0" y1="47" x2="20" y2="47" stroke="#94a3b8" stroke-width="1" transform="rotate(-10)" />
-                <!-- 尾巴 -->
                 <circle cx="45" cy="55" r="7" fill="#f8fafc" />
             </g>
 
             <!-- 左側：黑色兔子 -->
             <g id="black-rabbit-group">
-                <!-- 開場文字：位於黑兔頭部上方 -->
-                <text id="intro-text-element" x="300" y="320" text-anchor="middle" id="intro-text"></text>
-                
+                <text id="intro-text-element" x="300" y="320" text-anchor="middle"></text>
                 <image 
                     href="blackrabbit-test_工作區域 1.svg" 
                     x="120" y="300" 
@@ -163,8 +155,8 @@
         const introString = "小白兔在做什麼呢？";
         const introElement = document.getElementById('intro-text-element');
         const hintElement = document.getElementById('hintText');
+        const blurElement = document.getElementById('blurElement');
 
-        // 打字效果函式
         function typeIntroText() {
             let i = 0;
             const timer = setInterval(() => {
@@ -173,16 +165,33 @@
                     i++;
                 } else {
                     clearInterval(timer);
-                    // 打字結束後顯示 Hint
                     setTimeout(() => {
                         hintElement.classList.add('visible');
                     }, 500);
                 }
-            }, 150); // 設定快速打字速度
+            }, 150);
+        }
+
+        // 動畫化 SVG 濾鏡數值的函式
+        function animateBlur(start, end, duration) {
+            const startTime = performance.now();
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease In Out 四次方的緩動效果
+                const easeProgress = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                
+                const currentValue = start + (end - start) * easeProgress;
+                blurElement.setAttribute('stdDeviation', currentValue);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            requestAnimationFrame(update);
         }
 
         function toggleFocus() {
-            // 只有在 Hint 已經出現（文字跑完）後，點擊才有反應
             if (!hintElement.classList.contains('visible')) return;
 
             focused = !focused;
@@ -191,14 +200,17 @@
             
             if (focused) {
                 app.classList.add('is-focused');
-                hint.textContent = "  ";
+                hint.textContent = " ";
+                // 將 SVG 濾鏡從 15 變為 0
+                animateBlur(15, 0, 2000);
             } else {
                 app.classList.remove('is-focused');
                 hint.textContent = "點擊畫面看看";
+                // 將 SVG 濾鏡從 0 變為 15
+                animateBlur(0, 15, 2000);
             }
         }
 
-        // 頁面載入後啟動打字動畫
         window.onload = typeIntroText;
     </script>
 </body>
