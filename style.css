@@ -64,9 +64,37 @@ body {
     z-index: 45;
 }
 
+.title {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    color: white;
+    font-size: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.hint {
+    position: fixed;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 45;
+}
+
 #playBtn {
     position: absolute;
-    bottom: 172px;
+    bottom: 30%;
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 60px;
@@ -181,69 +209,4 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.scene5-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 35;
-}
-
-#scene5 {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Mind Bubbles：預設隱藏，分散在畫面各區域 */
-/* Mind Bubbles：預設隱藏，全部置中顯示 */
-#mindbubble1,
-#mindbubble2,
-#mindbubble3,
-#mindbubble4,
-#mindbubble5,
-#mindbubble6 {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: auto;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 40;
-    cursor: pointer;
-}
- 
-#mindbubble1 { width: 800px; }
-#mindbubble2 { width: 800px; }
-#mindbubble3 { width: 800px; }
-#mindbubble4 { width: 800px; }
-#mindbubble5 { width: 800px; }
-#mindbubble6 { width: 1000px; }
-
-.hints #hintClick{
-    position: fixed;
-    top: 12%;
-    color: black;
-    font-size: 32px;
-    font-family: Arial, Helvetica, sans-serif;
-    cursor: none;
-    pointer-events: none;
-}
-
-#hintClick-img-scene5 {
-    position: fixed;
-    top: 25%;
-    left: 60%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: auto;
-    opacity: 0;
-    z-index: 45;
-    pointer-events: none;
 }

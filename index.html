@@ -10,32 +10,24 @@
 <body>
     <!-- main -->
     <div class="scene1-container">
-        <video id="scene1" src="videos/scene1.mp4" preload="auto" muted playsinline></video>
+        <video id="scene1" src="assets/scene1.mp4" preload="auto" muted playsinline></video>
+        <div class="title">失眠 不焦慮</div>
         <button id="playBtn">進入故事</button>
     </div>
     <div class="scene2-container">
-        <video id="scene2" src="videos/scene2.mp4" preload="auto" muted playsinline></video>
-        <img id="hintScrolling-img" src="images/hintScrolling.png">
+        <video id="scene2" src="assets/scene2.mp4" preload="auto" muted playsinline></video>
+        <img id="hintScrolling-img" src="assets/hintScrolling.png">
+        <div class="hint">請向下滑動畫面</div>
     </div>
     <div class="scene3-container">
-        <video id="scene3" src="videos/scene3.mp4" preload="auto" muted playsinline></video>
-        <img id="scene3-img" src="images/scene3-3.png">
-        <img id="hintClick-img" src="images/hintClick.png">
+        <video id="scene3" src="assets/scene3.mp4" preload="auto" muted playsinline></video>
+        <img id="scene3-img" src="assets/scene3-3.png">
+        <img id="hintClick-img" src="assets/hintClick.png">
         <button id="phoneBtn"></button>
     </div>
     <div class="scene4-container">
-        <video id="scene4" src="videos/scene4.mp4" preload="auto" muted playsinline></video>
+        <video id="scene4" src="assets/scene4.mp4" preload="auto" muted playsinline></video>
     </div>
-    <div class="scene5-container">
-        <video id="scene5" src="videos/scene5.mp4" preload="auto" muted playsinline></video>
-        <img id="mindbubble1" src="images/mind bubbles1.png">
-        <img id="mindbubble2" src="images/mind bubbles2.png">
-        <img id="mindbubble3" src="images/mind bubbles3.png">
-        <img id="mindbubble4" src="images/mind bubbles4.png">
-        <img id="mindbubble5" src="images/mind bubbles5.png">
-        <img id="mindbubble6" src="images/mind bubbles6.png">
-    </div>
-    <img id="hintClick-img-scene5" src="images/hintClickBlack.png">
 
     <!-- captions -->
     <div class="captions">
@@ -43,10 +35,6 @@
         <p id="caption2">兩隻綿羊...</p>
         <p id="caption3">三隻綿羊...</p>
         <p id="caption4">這裡怎麼會有個大洞口？</p>
-    </div>
-    <div class="hints">
-        <p id="hintScrolling">請滾動滑鼠</p>
-        <p id="hintClick">點擊安撫小兔的焦慮想法</p>
     </div>
     <div class="scene3-captions">
         <p id="caption5">看來小兔還是睡不著</p>
@@ -59,5 +47,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="gsap.js"></script>
+
+        <!-- 手機尺寸提示 -->
+    <div id="mobile-notice" style="
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: #fff;
+        color: #222222;
+        font-size: 20px;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        box-sizing: border-box;
+        z-index: 9999;
+        line-height: 1.8;
+    ">
+        抱歉!本專案尚未進行 RWD 設計<br>請使用電腦進行體驗
+    </div>
+    <script>
+        function checkMobile() {
+            const notice = document.getElementById('mobile-notice')
+            if (window.innerWidth < 768) {
+                notice.style.display = 'flex'
+                document.body.style.overflow = 'hidden'
+            } else {
+                notice.style.display = 'none'
+            }
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+    </script>
 </body>
 </html>

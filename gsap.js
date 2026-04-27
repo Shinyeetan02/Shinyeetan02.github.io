@@ -9,8 +9,6 @@ const scene2 = document.getElementById('scene2')
 const scene3 = document.getElementById('scene3')
 // 第四幀
 const scene4 = document.getElementById('scene4')
-// 第五幀
-const scene5 = document.getElementById('scene5')
 // 按鈕1：進入故事
 const playBtn = document.getElementById('playBtn')
 // 時間軸建立，影片一開始先paused
@@ -22,6 +20,7 @@ const phoneBtn = document.getElementById('phoneBtn')
 playBtn.addEventListener('click', () => {
     scene1.play()
     gsap.to(playBtn, { opacity: 0, duration: 0.3, pointerEvents: 'none' })
+    gsap.to('.title', { opacity: 0, duration: 0.3 })
 })
 
 tl.to("#caption1", { opacity: 1, duration: 1 }, 0.01)
@@ -58,6 +57,7 @@ scene1.addEventListener('ended', () => {
     })
  
     gsap.to('#hintScrolling', { opacity: 1, duration: 0.8, delay: 0.8 })
+    gsap.to('.hint', { opacity: 1, duration: 0.8, delay: 0.8 })
  
     const hideHintOnScroll = () => {
         if (window._hintScrollAnim) {
@@ -66,6 +66,7 @@ scene1.addEventListener('ended', () => {
         }
         gsap.to('#hintScrolling-img', { opacity: 0, y: 0, duration: 0.4 })
         gsap.to('#hintScrolling', { opacity: 0, duration: 0.4 })
+        gsap.to('.hint', { opacity: 0, duration: 0.4 })
         window.removeEventListener('scroll', hideHintOnScroll)
     }
     window.addEventListener('scroll', hideHintOnScroll, { passive: true })
@@ -182,77 +183,10 @@ phoneBtn.addEventListener('click', () => {
     gsap.to('#hintClick-img', { opacity: 0, duration: 0.3 })
  
     scene4.currentTime = 0
-    // 確保 scene4 -> scene5 轉場時，其他 scenes 不會透出
+    // 確保轉場時，其他 scenes 不會透出
     gsap.to('.scene1-container', { opacity: 0, duration: 0.3 })
     gsap.to('.scene2-container', { opacity: 0, duration: 0.3 })
     gsap.to('.scene3-container', { opacity: 0, duration: 0.3 })
     gsap.to('.scene4-container', { opacity: 1, duration: 0.6, pointerEvents: 'auto' })
     scene4.play()
-
-    scene5.currentTime = 0
-    scene5.load()
-
-    // scene4 結束後接 scene5 循環播放
-    scene4.addEventListener('ended', () => {
-        scene5.loop = true
-        gsap.to('.scene4-container', { opacity: 0, duration: 0.6 })
-        gsap.to('.scene5-container', { opacity: 1, duration: 0, pointerEvents: 'auto' })
-        scene5.play()
-
-        // scene5 開始後淡入 hintClick 提示文字與圖片，並啟動閃爍動畫
-        gsap.to('#hintClick', { opacity: 1, duration: 0.6, delay: 0.3, overwrite: true })
- 
-        // Mind bubbles 依序點擊出現：bubble1 先出現，點擊後消失再出現 bubble2，依此類推
-        const bubbleIds = ['#mindbubble1','#mindbubble2','#mindbubble3','#mindbubble4','#mindbubble5','#mindbubble6']
-        let currentBubbleIndex = 0
- 
-        function showBubble(index) {
-            if (index >= bubbleIds.length) {
-                // 所有 bubble 點擊完畢，停止閃爍並淡出 hint 提示
-                if (window._hintClickScene5Anim) {
-                    window._hintClickScene5Anim.kill()
-                    window._hintClickScene5Anim = null
-                }
-                gsap.to('#hintClick-img-scene5', { opacity: 0, duration: 0.6 })
-                gsap.to('#hintClick', { opacity: 0, duration: 0.6 })
-                return
-            }
- 
-            const id = bubbleIds[index]
-            const el = document.querySelector(id)
- 
-            // 淡入當前 bubble，並開啟點擊事件
-            gsap.to(id, { opacity: 1, duration: 0.6, ease: 'power1.inOut', onComplete: () => {
-                el.style.pointerEvents = 'auto'
-            }})
- 
-            // 點擊後：淡出當前，顯示下一個
-            el.addEventListener('click', () => {
-                el.style.pointerEvents = 'none'
-                gsap.to(id, { opacity: 0, duration: 0.4, ease: 'power1.inOut', onComplete: () => {
-                    currentBubbleIndex++
-                    showBubble(currentBubbleIndex)
-                }})
-            }, { once: true })
-
-            gsap.to('#hintClick-img-scene5', {
-                opacity: 1,
-                duration: 0.8,
-                delay: 0.3,
-                overwrite: true,
-                onComplete: () => {
-                    window._hintClickScene5Anim = gsap.to('#hintClick-img-scene5', {
-                        opacity: 0,
-                        duration: 0.7,
-                        ease: 'power1.inOut',
-                        repeat: -1,
-                        yoyo: true
-                    })
-                }
-            })
-        }
-        gsap.delayedCall(1.0, () => showBubble(0))
-    }, { once: true })
-
-    // 設定點擊互動提示
 })
