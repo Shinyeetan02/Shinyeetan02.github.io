@@ -1,0 +1,249 @@
+* {
+    margin: 0;
+    padding: auto;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.scene1-container {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+}
+
+#scene1{
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+.scene2-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#scene2 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+#hintScrolling-img {
+    position: absolute;
+    top: 56%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: auto;
+    opacity: 0;
+}
+
+.hints p {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+    bottom: 180px;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    z-index: 45;
+}
+
+#playBtn {
+    position: absolute;
+    bottom: 172px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 14px 60px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    font-size: 24px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.5);
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+#playBtn:hover {
+    background: rgba(36, 85, 131, 0.35);
+  }
+
+.captions p {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: 0 2px 8px rgba(42, 42, 42, 0.3);
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0; /* 預設隱藏 */
+}
+
+.scene3-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20; /* z-index大於10 = 疊加在 scene2 上方 */
+}
+
+#scene3 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.scene3-captions p {
+    position: fixed;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-shadow: 0 2px 8px rgba(42, 42, 42, 0.3);
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    z-index: 25;
+}
+
+#scene3-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#hintClick-img {
+    position: absolute;
+    top: 23%;
+    left: 21%;
+    width: 120px;
+    height: auto;
+    opacity: 0;
+}
+
+#phoneBtn {
+    position: absolute;
+    top: 27%;
+    left: 23%;
+    width: 100px;
+    height: 60px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: rotate(-15deg);
+    z-index: 100;
+}
+
+.scene4-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 30;
+}
+
+#scene4 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.scene5-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 35;
+}
+
+#scene5 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Mind Bubbles：預設隱藏，分散在畫面各區域 */
+/* Mind Bubbles：預設隱藏，全部置中顯示 */
+#mindbubble1,
+#mindbubble2,
+#mindbubble3,
+#mindbubble4,
+#mindbubble5,
+#mindbubble6 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: auto;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 40;
+    cursor: pointer;
+}
+ 
+#mindbubble1 { width: 800px; }
+#mindbubble2 { width: 800px; }
+#mindbubble3 { width: 800px; }
+#mindbubble4 { width: 800px; }
+#mindbubble5 { width: 800px; }
+#mindbubble6 { width: 1000px; }
+
+.hints #hintClick{
+    position: fixed;
+    top: 12%;
+    color: black;
+    font-size: 32px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: none;
+    pointer-events: none;
+}
+
+#hintClick-img-scene5 {
+    position: fixed;
+    top: 25%;
+    left: 60%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: auto;
+    opacity: 0;
+    z-index: 45;
+    pointer-events: none;
+}
